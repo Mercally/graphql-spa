@@ -1,0 +1,54 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/projects">Projects</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!project()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (project(); as p) {
+      <div class="card">
+        <h1>{{ p.name }}</h1>
+        <p>{{ p.description }}</p>
+        <p><span class="badge">{{ p.status }}</span></p>
+        <p class="muted">Updated {{ p.updatedAt | date: 'medium' }}</p>
+      </div>
+
+      <div class="card">
+        <h2>Tasks ({{ taskList().length }})</h2>
+        @if (taskList().length) {
+          <ul class="tree">
+            @for (task of taskList(); track task.id) {
+              <li>
+                <a [routerLink]="['/tasks', task.id]">{{ task.title }}</a>
+                <span class="badge">{{ task.status }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No tasks yet.</p>
+        }
+      </div>
+
+      <div class="card">
+        <h2>Teams ({{ teamList().length }})</h2>
+        @if (teamList().length) {
+          <ul class="tree">
+            @for (team of teamList(); track team.id) {
+              <li>
+                <a [routerLink]="['/teams', team.id]">{{ team.name }}</a>
+                <span class="muted">{{ team.memberUserIds.length }} members</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No teams yet.</p>
+        }
+      </div>
+    }
+  }
+</section>

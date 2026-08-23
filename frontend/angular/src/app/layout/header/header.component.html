@@ -1,0 +1,32 @@
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark">WM</span>
+    <span>Work Management PoC</span>
+  </div>
+
+  <nav class="nav">
+    @for (link of navLinks; track link.path) {
+      <a [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
+    }
+  </nav>
+
+  <div class="settings-bar">
+    <label>
+      <span>Client</span>
+      <select [value]="settings.mode()" (change)="onModeChange($any($event.target).value)">
+        <option value="rest">REST</option>
+        <option value="graphql">GraphQL</option>
+      </select>
+    </label>
+    <label>
+      <span>Backend</span>
+      <select [value]="settings.backend()" (change)="onBackendChange($any($event.target).value)">
+        <option value="dotnet">.NET (:5000)</option>
+        <option value="node">Node.js (:4000)</option>
+      </select>
+    </label>
+    <span class="mode-badge" [class.mode-rest]="settings.mode() === 'rest'" [class.mode-graphql]="settings.mode() === 'graphql'">
+      {{ settings.mode() === 'rest' ? 'REST' : 'GraphQL' }} &middot; {{ settings.backendLabel() }}
+    </span>
+  </div>
+</header>

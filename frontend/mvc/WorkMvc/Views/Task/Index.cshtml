@@ -1,0 +1,71 @@
+@model List<TaskListItemVm>
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<h2>Tasks</h2>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-center mb-3">
+    <div class="col-12">
+        <select name="status" class="form-select form-select-sm">
+            <option value="">All statuses</option>
+            @foreach (var s in new[] { "Todo", "InProgress", "InReview", "Done" })
+            {
+                <option value="@s" selected="@(ViewBag.Status == s)">@s</option>
+            }
+        </select>
+    </div>
+    <div class="col-12">
+        <input type="text" name="projectId" value="@ViewBag.ProjectId" placeholder="Filter by projectId" class="form-control form-control-sm" />
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+    </div>
+</form>
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">No tasks match this filter.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Project</th>
+                <th>Assigned to</th>
+                <th>Tags</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.Title</td>
+                    <td><span class="badge bg-secondary">@t.Status</span></td>
+                    <td><a asp-controller="Project" asp-action="Details" asp-route-id="@t.ProjectId">@t.ProjectId</a></td>
+                    <td>
+                        @if (t.AssignedUser != null)
+                        {
+                            <a asp-controller="User" asp-action="Details" asp-route-id="@t.AssignedUser.Id">@t.AssignedUser.Name</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">unassigned</span>
+                        }
+                    </td>
+                    <td>
+                        @foreach (var tag in t.Tags)
+                        {
+                            <span class="badge" style="background-color:@tag.Color">@tag.Name</span>
+                        }
+                    </td>
+                    <td><a class="btn btn-sm btn-outline-primary" asp-controller="Task" asp-action="Details" asp-route-id="@t.Id">Open &rarr;</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,25 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/customers">Customers</a> / {{ customerId() ? 'Edit' : 'New' }}</p>
+  <h1>{{ customerId() ? 'Edit Customer' : 'New Customer' }}</h1>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-field">
+      <label for="name">Name</label>
+      <input id="name" type="text" formControlName="name" />
+    </div>
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" />
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit" [disabled]="form.invalid || saving()">
+        {{ saving() ? 'Saving…' : 'Save' }}
+      </button>
+      <a class="btn" routerLink="/customers">Cancel</a>
+    </div>
+  </form>
+</section>

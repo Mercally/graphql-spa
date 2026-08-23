@@ -1,0 +1,36 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/teams">Teams</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!team()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (team(); as t) {
+      <div class="card">
+        <h1>{{ t.name }}</h1>
+        <p class="muted"><a [routerLink]="['/projects', t.projectId]">View project</a></p>
+      </div>
+
+      <div class="card">
+        <h2>Members ({{ members().length }})</h2>
+        @if (members().length) {
+          <ul class="tree">
+            @for (user of members(); track user.id) {
+              <li>
+                <a [routerLink]="['/users', user.id]">{{ user.name }}</a>
+                <span class="badge">{{ user.role }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No members.</p>
+        }
+      </div>
+    }
+  }
+</section>

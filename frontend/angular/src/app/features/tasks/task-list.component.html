@@ -1,0 +1,43 @@
+<section class="page">
+  <div class="toolbar">
+    <h1>Tasks</h1>
+    <a class="btn btn-primary" routerLink="/tasks/new">+ New Task</a>
+    <label class="form-field" style="margin:0">
+      <span>Status filter</span>
+      <select [ngModel]="statusFilter()" (ngModelChange)="onFilterChange($event)">
+        <option value="">All</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading tasks&hellip;</p>
+  } @else {
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Title</th><th>Status</th><th>Tags</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (task of items(); track task.id) {
+            <tr>
+              <td>{{ task.title }}</td>
+              <td><span class="badge">{{ task.status }}</span></td>
+              <td>{{ task.tagIds.length }}</td>
+              <td><a [routerLink]="['/tasks', task.id]">View</a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="muted">No tasks found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

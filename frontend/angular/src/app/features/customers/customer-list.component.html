@@ -1,0 +1,35 @@
+<section class="page">
+  <div class="toolbar">
+    <h1>Customers</h1>
+    <a class="btn btn-primary" routerLink="/customers/new">+ New Customer</a>
+    <button class="btn" (click)="load()">Refresh</button>
+  </div>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading customers&hellip;</p>
+  } @else {
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Created</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (customer of items(); track customer.id) {
+            <tr>
+              <td>{{ customer.name }}</td>
+              <td>{{ customer.email }}</td>
+              <td class="muted">{{ customer.createdAt | date: 'mediumDate' }}</td>
+              <td><a [routerLink]="['/customers', customer.id]">View</a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="muted">No customers found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

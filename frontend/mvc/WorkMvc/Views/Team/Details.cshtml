@@ -1,0 +1,38 @@
+@model TeamDetailVm
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<p><a asp-controller="Project" asp-action="Details" asp-route-id="@Model.ProjectId">&larr; Back to project</a></p>
+
+<h2>@Model.Name</h2>
+
+<h4>Members (@Model.Users.Count)</h4>
+@if (Model.Users.Count == 0)
+{
+    <p class="text-muted">No members on this team.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model.Users)
+            {
+                <tr>
+                    <td>@u.Name</td>
+                    <td>@u.Email</td>
+                    <td>@u.Role</td>
+                    <td><a class="btn btn-sm btn-outline-primary" asp-controller="User" asp-action="Details" asp-route-id="@u.Id">View &rarr;</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

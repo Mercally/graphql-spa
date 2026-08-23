@@ -1,0 +1,68 @@
+@{
+    // Renders the "which paradigm / which backend / how many HTTP calls" banner that
+    // Requirements.md section 12 point 5 asks every page to show, plus 4 links that let you
+    // switch REST/GraphQL and .NET/Node while staying on the current page. Query-string
+    // params other than mode/backend (e.g. Task/Index's status/projectId filters) are
+    // preserved so switching mode never loses your place.
+    var hasMode = ViewBag.Mode != null;
+    string mode = ViewBag.Mode ?? "Rest";
+    string backend = ViewBag.Backend ?? "Dotnet";
+    int callCount = ViewBag.CallCount ?? 0;
+    IReadOnlyList<string> calls = ViewBag.Calls ?? new List<string>();
+
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Customer";
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+
+    var baseRoute = new Dictionary<string, string>();
+    foreach (var kv in Context.Request.Query)
+    {
+        if (!string.Equals(kv.Key, "mode", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(kv.Key, "backend", StringComparison.OrdinalIgnoreCase))
+        {
+            baseRoute[kv.Key] = kv.Value.ToString();
+        }
+    }
+    if (ViewContext.RouteData.Values.TryGetValue("id", out var idVal) && idVal != null)
+    {
+        baseRoute["id"] = idVal.ToString()!;
+    }
+
+    Dictionary<string, string> RouteFor(string m, string b)
+    {
+        var d = new Dictionary<string, string>(baseRoute) { ["mode"] = m, ["backend"] = b };
+        return d;
+    }
+}
+@if (hasMode)
+{
+    var modeBadgeClass = mode == "GraphQl" ? "bg-danger" : "bg-primary";
+    <div class="alert alert-light border d-flex flex-wrap align-items-center gap-2 mb-4">
+        <strong class="me-2">This page was rendered using:</strong>
+        <span class="badge @modeBadgeClass fs-6">@(mode == "GraphQl" ? "GraphQL" : "REST")</span>
+        <span class="badge bg-secondary fs-6">@(backend == "Node" ? "Node.js backend" : ".NET backend")</span>
+        <span class="badge bg-dark fs-6">@callCount backend HTTP call@(callCount == 1 ? "" : "s")</span>
+
+        @if (calls.Count > 0)
+        {
+            <details class="ms-2">
+                <summary class="text-muted" style="cursor:pointer">show calls</summary>
+                <ul class="mb-0 small">
+                    @foreach (var call in calls)
+                    {
+                        <li><code>@call</code></li>
+                    }
+                </ul>
+            </details>
+        }
+
+        <span class="ms-auto small text-muted">Switch:</span>
+        <a class="btn btn-sm @(mode != "GraphQl" && backend != "Node" ? "btn-primary" : "btn-outline-primary")"
+           asp-controller="@controllerName" asp-action="@actionName" asp-all-route-data="@RouteFor("rest", "dotnet")">REST · .NET</a>
+        <a class="btn btn-sm @(mode != "GraphQl" && backend == "Node" ? "btn-primary" : "btn-outline-primary")"
+           asp-controller="@controllerName" asp-action="@actionName" asp-all-route-data="@RouteFor("rest", "node")">REST · Node</a>
+        <a class="btn btn-sm @(mode == "GraphQl" && backend != "Node" ? "btn-danger" : "btn-outline-danger")"
+           asp-controller="@controllerName" asp-action="@actionName" asp-all-route-data="@RouteFor("graphql", "dotnet")">GraphQL · .NET</a>
+        <a class="btn btn-sm @(mode == "GraphQl" && backend == "Node" ? "btn-danger" : "btn-outline-danger")"
+           asp-controller="@controllerName" asp-action="@actionName" asp-all-route-data="@RouteFor("graphql", "node")">GraphQL · Node</a>
+    </div>
+}

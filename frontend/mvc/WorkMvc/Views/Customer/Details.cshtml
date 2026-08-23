@@ -1,0 +1,41 @@
+@model CustomerDetailVm
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<p><a asp-controller="Customer" asp-action="Index">&larr; All customers</a></p>
+
+<h2>@Model.Name</h2>
+<p class="text-muted">@Model.Email</p>
+
+<h4>Projects (@Model.Projects.Count)</h4>
+@if (Model.Projects.Count == 0)
+{
+    <p class="text-muted">No projects for this customer.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Projects)
+            {
+                <tr>
+                    <td>@p.Name</td>
+                    <td><span class="badge bg-info text-dark">@p.Status</span></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Project" asp-action="Details" asp-route-id="@p.Id">
+                            View tasks &amp; teams &rarr;
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,21 @@
+<section class="page">
+  <h1>Tags</h1>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading tags&hellip;</p>
+  } @else {
+    <div class="pill-row">
+      @for (tag of items(); track tag.id) {
+        <a class="badge" [routerLink]="['/tags', tag.id]" [style.background]="tag.color + '22'" [style.color]="tag.color">
+          {{ tag.name }}
+        </a>
+      } @empty {
+        <p class="muted">No tags found.</p>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,37 @@
+<div class="card count-panel" [class.count-panel-rest]="settings.mode() === 'rest'" [class.count-panel-graphql]="settings.mode() === 'graphql'">
+  <div class="card-header">
+    <h2>Request count — {{ settings.mode() === 'rest' ? 'REST' : 'GraphQL' }} mode</h2>
+    <span class="count-number">
+      {{ settings.mode() === 'rest' ? counter.restCount() : counter.graphqlCount() }}
+    </span>
+  </div>
+  <p class="muted">
+    @if (settings.mode() === 'rest') {
+      Every REST call below was counted live by the HttpInterceptor while building this view.
+    } @else {
+      GraphQL rendered the entire nested tree with this many round trips to {{ settings.backendLabel() }}.
+    }
+  </p>
+
+  @if (settings.mode() === 'rest' && counter.restLog().length) {
+    <details>
+      <summary>Show the {{ counter.restLog().length }} REST requests</summary>
+      <ol class="request-log">
+        @for (entry of counter.restLog(); track $index) {
+          <li><code>{{ entry }}</code></li>
+        }
+      </ol>
+    </details>
+  }
+
+  @if (settings.mode() === 'graphql' && counter.graphqlLog().length) {
+    <details open>
+      <summary>Show the GraphQL operation(s)</summary>
+      <ol class="request-log">
+        @for (entry of counter.graphqlLog(); track $index) {
+          <li><code>{{ entry }}</code></li>
+        }
+      </ol>
+    </details>
+  }
+</div>

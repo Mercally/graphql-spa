@@ -1,0 +1,59 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/tasks">Tasks</a> / {{ taskId() ? 'Edit' : 'New' }}</p>
+  <h1>{{ taskId() ? 'Edit Task' : 'New Task' }}</h1>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-field">
+      <label for="title">Title</label>
+      <input id="title" type="text" formControlName="title" />
+    </div>
+    <div class="form-field">
+      <label for="description">Description</label>
+      <textarea id="description" rows="3" formControlName="description"></textarea>
+    </div>
+    <div class="form-field">
+      <label for="projectId">Project</label>
+      <select id="projectId" formControlName="projectId">
+        <option value="" disabled>Select a project</option>
+        @for (project of projectOptions(); track project.id) {
+          <option [value]="project.id">{{ project.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="status">Status</label>
+      <select id="status" formControlName="status">
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="assignedUserId">Assigned user</label>
+      <select id="assignedUserId" formControlName="assignedUserId">
+        <option value="">Unassigned</option>
+        @for (user of userOptions(); track user.id) {
+          <option [value]="user.id">{{ user.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="tagIds">Tags (ctrl/cmd+click for multiple)</label>
+      <select id="tagIds" multiple size="5" (change)="onTagsChange($event)">
+        @for (tag of tagOptions(); track tag.id) {
+          <option [value]="tag.id" [selected]="form.value.tagIds?.includes(tag.id)">{{ tag.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit" [disabled]="form.invalid || saving()">
+        {{ saving() ? 'Saving…' : 'Save' }}
+      </button>
+      <a class="btn" routerLink="/tasks">Cancel</a>
+    </div>
+  </form>
+</section>

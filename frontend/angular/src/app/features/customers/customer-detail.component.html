@@ -1,0 +1,43 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/customers">Customers</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!customer()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (customer(); as c) {
+      <div class="card">
+        <div class="card-header">
+          <h1>{{ c.name }}</h1>
+          <div class="toolbar" style="margin:0">
+            <a class="btn" [routerLink]="['/customers', c.id, 'edit']">Edit</a>
+            <button class="btn btn-danger" (click)="deleteCustomer()">Delete</button>
+          </div>
+        </div>
+        <p><strong>Email:</strong> {{ c.email }}</p>
+        <p class="muted">Created {{ c.createdAt | date: 'medium' }}</p>
+      </div>
+
+      <div class="card">
+        <h2>Projects</h2>
+        @if (projectList().length) {
+          <ul class="tree">
+            @for (project of projectList(); track project.id) {
+              <li>
+                <a [routerLink]="['/projects', project.id]">{{ project.name }}</a>
+                <span class="badge">{{ project.status }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No projects for this customer yet.</p>
+        }
+      </div>
+    }
+  }
+</section>

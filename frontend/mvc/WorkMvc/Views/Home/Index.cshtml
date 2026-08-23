@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "About";
+}
+
+<div class="py-4">
+    <h1 class="display-6">WorkMvc</h1>
+    <p class="lead">
+        ASP.NET Core MVC client for the REST vs GraphQL Proof of Concept. This app never talks
+        to MongoDB directly - every page is rendered from data fetched over HTTP from either
+        the .NET backend (port 5000) or the Node.js backend (port 4000), using either their
+        REST API or their GraphQL API.
+    </p>
+
+    <h5>How to switch backend/mode</h5>
+    <p>
+        Append <code>?mode=rest|graphql&amp;backend=dotnet|node</code> to any URL, or use the
+        switch buttons shown on every data page. The choice sticks (via a cookie) as you
+        navigate.
+    </p>
+
+    <h5>Where to look</h5>
+    <ul>
+        <li><a asp-controller="Customer" asp-action="Index">Customers</a> - list, then drill into a customer's projects</li>
+        <li><a asp-controller="Task" asp-action="Index">Tasks</a> - filterable task list with assigned user + tags</li>
+    </ul>
+    <p class="text-muted">
+        Try Customer &rarr; Project (nested Tasks/Teams) &rarr; Task (AssignedUser/Tags/Comments) in both
+        REST and GraphQL mode and compare the "backend HTTP calls" counter shown at the top of each page.
+    </p>
+</div>

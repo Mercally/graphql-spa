@@ -1,0 +1,28 @@
+<section class="page">
+  <h1>Comments</h1>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading comments&hellip;</p>
+  } @else {
+    <div class="card">
+      <ul class="tree">
+        @for (comment of items(); track comment.id) {
+          <li class="tree-node">
+            <p>{{ comment.text }}</p>
+            <p class="muted">
+              {{ comment.createdAt | date: 'short' }} &middot;
+              <a [routerLink]="['/tasks', comment.taskId]">on task</a> &middot;
+              <a [routerLink]="['/comments', comment.id]">detail</a>
+            </p>
+          </li>
+        } @empty {
+          <li class="muted">No comments found.</li>
+        }
+      </ul>
+    </div>
+  }
+</section>

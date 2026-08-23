@@ -1,0 +1,61 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/tasks">Tasks</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!task()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (task(); as t) {
+      <div class="card">
+        <div class="card-header">
+          <h1>{{ t.title }}</h1>
+          <div class="toolbar" style="margin:0">
+            <a class="btn" [routerLink]="['/tasks', t.id, 'edit']">Edit</a>
+            <button class="btn btn-danger" (click)="deleteTask()">Delete</button>
+          </div>
+        </div>
+        <p>{{ t.description }}</p>
+        <p><span class="badge">{{ t.status }}</span></p>
+        <p class="muted">Updated {{ t.updatedAt | date: 'medium' }}</p>
+
+        <p><strong>Assigned to:</strong>
+          @if (assignedUser(); as u) {
+            <a [routerLink]="['/users', u.id]">{{ u.name }}</a>
+          } @else {
+            <span class="muted">Unassigned</span>
+          }
+        </p>
+
+        <p><strong>Tags:</strong></p>
+        <div class="pill-row">
+          @for (tag of tagList(); track tag.id) {
+            <a class="badge" [routerLink]="['/tags', tag.id]" [style.background]="tag.color + '22'" [style.color]="tag.color">{{ tag.name }}</a>
+          } @empty {
+            <span class="muted">No tags</span>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Comments ({{ commentList().length }})</h2>
+        @if (commentList().length) {
+          <ul class="tree">
+            @for (comment of commentList(); track comment.id) {
+              <li class="tree-node">
+                <p>{{ comment.text }}</p>
+                <p class="muted">{{ comment.createdAt | date: 'short' }}</p>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No comments yet.</p>
+        }
+      </div>
+    }
+  }
+</section>

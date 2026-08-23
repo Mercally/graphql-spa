@@ -1,0 +1,13 @@
+{
+  "name": "seed",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone MongoDB seed script for the gRPC-GraphQL PoC (run after `docker compose up -d`)",
+  "main": "seed.js",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.9.0"
+  }
+}

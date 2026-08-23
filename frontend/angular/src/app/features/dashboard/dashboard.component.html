@@ -1,0 +1,98 @@
+<section class="page">
+  <h1>Dashboard</h1>
+  <p class="muted">
+    Customer &rarr; Projects &rarr; Tasks (Assigned User / Tags / Comments) and Projects &rarr; Teams &rarr; Users,
+    in one screen. Switch REST/GraphQL in the header to compare request counts for the exact same view.
+  </p>
+
+  <div class="toolbar">
+    <label class="form-field" style="margin:0">
+      <span>Customer</span>
+      <select [ngModel]="selectedCustomerId()" (ngModelChange)="selectCustomer($event)">
+        @for (customer of customers(); track customer.id) {
+          <option [value]="customer.id">{{ customer.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  <app-request-count-panel />
+
+  @if (loading()) {
+    <p class="loading">Loading dashboard&hellip;</p>
+  } @else if (!dashboard()) {
+    <p class="muted">Select a customer.</p>
+  } @else {
+  @if (dashboard(); as customer) {
+    <div class="card">
+      <h2>{{ customer.name }}</h2>
+      <p class="muted">{{ customer.email }}</p>
+    </div>
+
+    @for (project of customer.projects; track project.id) {
+      <div class="card">
+        <div class="card-header">
+          <h2><a [routerLink]="['/projects', project.id]">{{ project.name }}</a></h2>
+          <span class="badge">{{ project.status }}</span>
+        </div>
+
+        <div class="dashboard-grid">
+          <div>
+            <h3>Teams</h3>
+            @for (team of project.teams; track team.id) {
+              <div class="tree-node" style="margin-bottom:0.5rem">
+                <strong><a [routerLink]="['/teams', team.id]">{{ team.name }}</a></strong>
+                <div class="pill-row">
+                  @for (user of team.users; track user.id) {
+                    <a class="badge" [routerLink]="['/users', user.id]">{{ user.name }}</a>
+                  } @empty {
+                    <span class="muted">No members</span>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="muted">No teams.</p>
+            }
+          </div>
+
+          <div>
+            <h3>Tasks</h3>
+            <ul class="tree">
+              @for (task of project.tasks; track task.id) {
+                <li class="tree-node">
+                  <div class="card-header" style="margin-bottom:0.35rem">
+                    <a [routerLink]="['/tasks', task.id]"><strong>{{ task.title }}</strong></a>
+                    <span class="badge">{{ task.status }}</span>
+                  </div>
+                  <p class="muted" style="margin:0 0 0.35rem">
+                    Assigned to
+                    @if (task.assignedUser) {
+                      <a [routerLink]="['/users', task.assignedUser.id]">{{ task.assignedUser.name }}</a>
+                    } @else {
+                      nobody
+                    }
+                  </p>
+                  <div class="pill-row">
+                    @for (tag of task.tags; track tag.id) {
+                      <span class="badge" [style.background]="tag.color + '22'" [style.color]="tag.color">{{ tag.name }}</span>
+                    }
+                  </div>
+                  <p class="muted" style="margin:0.35rem 0 0">{{ task.comments?.length ?? 0 }} comment(s)</p>
+                </li>
+              } @empty {
+                <li class="muted">No tasks.</li>
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <p class="muted">This customer has no projects yet.</p>
+    }
+  }
+  }
+</section>

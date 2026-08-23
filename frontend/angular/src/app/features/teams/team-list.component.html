@@ -1,0 +1,30 @@
+<section class="page">
+  <h1>Teams</h1>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading teams&hellip;</p>
+  } @else {
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Members</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (team of items(); track team.id) {
+            <tr>
+              <td>{{ team.name }}</td>
+              <td>{{ team.memberUserIds.length }}</td>
+              <td><a [routerLink]="['/teams', team.id]">View</a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="muted">No teams found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

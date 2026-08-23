@@ -1,0 +1,21 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/tags">Tags</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!tag()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (tag(); as t) {
+      <div class="card">
+        <h1><span class="badge" [style.background]="t.color + '22'" [style.color]="t.color">{{ t.name }}</span></h1>
+        <p class="muted">Color: {{ t.color }}</p>
+        <p class="muted">Created {{ t.createdAt | date: 'medium' }}</p>
+      </div>
+    }
+  }
+</section>

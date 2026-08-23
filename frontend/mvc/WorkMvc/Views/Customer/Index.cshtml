@@ -1,0 +1,30 @@
+@model List<CustomerListItemVm>
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<h2>Customers</h2>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.Email</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" asp-controller="Customer" asp-action="Details" asp-route-id="@c.Id">
+                        View projects &rarr;
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

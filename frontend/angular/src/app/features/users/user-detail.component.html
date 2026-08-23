@@ -1,0 +1,22 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/users">Users</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!user()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (user(); as u) {
+      <div class="card">
+        <h1>{{ u.name }}</h1>
+        <p><strong>Email:</strong> {{ u.email }}</p>
+        <p><span class="badge">{{ u.role }}</span></p>
+        <p class="muted">Joined {{ u.createdAt | date: 'medium' }}</p>
+      </div>
+    }
+  }
+</section>

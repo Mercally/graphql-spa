@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: poc-mongodb
+    restart: unless-stopped
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_DATABASE: "${MONGODB_DATABASE:-workmanagement}"
+    volumes:
+      - mongodb_data:/data/db
+
+# Seeding is a separate, explicit step (not an automatic container-init
+# script) — after `docker compose up -d`, run:
+#   cd scripts/seed && npm install && npm run seed
+
+volumes:
+  mongodb_data:
+    driver: local

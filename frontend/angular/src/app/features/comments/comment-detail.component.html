@@ -1,0 +1,29 @@
+<section class="page">
+  <p class="breadcrumb"><a routerLink="/comments">Comments</a> / Detail</p>
+
+  @if (error()) {
+    <div class="error-box">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading&hellip;</p>
+  } @else if (!comment()) {
+    <p class="muted">Not found.</p>
+  } @else {
+    @if (comment(); as c) {
+      <div class="card">
+        <p>{{ c.text }}</p>
+        <p class="muted">
+          By
+          @if (author(); as a) {
+            <a [routerLink]="['/users', a.id]">{{ a.name }}</a>
+          } @else {
+            unknown user
+          }
+          &middot; {{ c.createdAt | date: 'medium' }}
+        </p>
+        <p><a [routerLink]="['/tasks', c.taskId]">View task</a></p>
+      </div>
+    }
+  }
+</section>

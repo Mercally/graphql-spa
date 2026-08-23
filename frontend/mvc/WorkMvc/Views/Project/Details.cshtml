@@ -1,0 +1,90 @@
+@model ProjectDetailVm
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<p><a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">&larr; Back to customer</a></p>
+
+<h2>@Model.Name <span class="badge bg-info text-dark">@Model.Status</span></h2>
+<p>@Model.Description</p>
+
+<div class="row">
+    <div class="col-md-7">
+        <h4>Tasks (@Model.Tasks.Count)</h4>
+        @if (Model.Tasks.Count == 0)
+        {
+            <p class="text-muted">No tasks for this project.</p>
+        }
+        else
+        {
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Assigned to</th>
+                        <th>Tags</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Tasks)
+                    {
+                        <tr>
+                            <td>@t.Title</td>
+                            <td><span class="badge bg-secondary">@t.Status</span></td>
+                            <td>
+                                @if (t.AssignedUser != null)
+                                {
+                                    <a asp-controller="User" asp-action="Details" asp-route-id="@t.AssignedUser.Id">@t.AssignedUser.Name</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">unassigned</span>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var tag in t.Tags)
+                                {
+                                    <span class="badge" style="background-color:@tag.Color">@tag.Name</span>
+                                }
+                            </td>
+                            <td><a class="btn btn-sm btn-outline-primary" asp-controller="Task" asp-action="Details" asp-route-id="@t.Id">Open &rarr;</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="col-md-5">
+        <h4>Teams (@Model.Teams.Count)</h4>
+        @if (Model.Teams.Count == 0)
+        {
+            <p class="text-muted">No teams for this project.</p>
+        }
+        else
+        {
+            @foreach (var team in Model.Teams)
+            {
+                <div class="card mb-2">
+                    <div class="card-body py-2">
+                        <h6 class="card-title mb-1">
+                            <a asp-controller="Team" asp-action="Details" asp-route-id="@team.Id">@team.Name</a>
+                        </h6>
+                        <p class="card-text small mb-0">
+                            @if (team.Users.Count == 0)
+                            {
+                                <span class="text-muted">no members</span>
+                            }
+                            else
+                            {
+                                @string.Join(", ", team.Users.Select(u => u.Name))
+                            }
+                        </p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
