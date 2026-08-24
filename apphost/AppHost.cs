@@ -40,17 +40,16 @@ var nodeApi = builder.AddNpmApp("node-api", "../backend/node", "dev")
 // header toggle, so it only needs both backends to be reachable, not a
 // single injected base URL.
 var angular = builder.AddNpmApp("angular", "../frontend/angular", "start")
-    .WithHttpEndpoint(port: 4200, env: "PORT")
-    //.WithArgs("--port", "4200")
-    .WithArgs("angular")
+    .WithHttpEndpoint(port: 4200, targetPort: 4201, env: "PORT")
+    .WithArgs("--", "angular", "--port", "4201")
     .WaitFor(dotnetApi)
     .WaitFor(nodeApi)
     .WithExternalHttpEndpoints();
 
 // React — same idea, its own runtime backend/mode toggle.
 var react = builder.AddNpmApp("react", "../frontend/react", "dev")
-    .WithHttpEndpoint(port: 5173, env: "PORT")
-    .WithArgs("--port", "5173")
+    .WithHttpEndpoint(port: 5173, targetPort: 5174, env: "PORT")
+    .WithArgs("--", "--port", "5174")
     .WaitFor(dotnetApi)
     .WaitFor(nodeApi)
     .WithExternalHttpEndpoints();
