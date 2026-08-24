@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "NotificationService.Protos";
+
+package notification;
+
+// Generic email-send contract - the caller (WorkApi) decides what the email
+// says (task-assigned, welcome, etc.); this service only simulates delivery.
+service EmailNotifier {
+  rpc SendEmail (SendEmailRequest) returns (SendEmailAck);
+}
+
+message SendEmailRequest {
+  string to = 1;
+  string subject = 2;
+  string body = 3;
+}
+
+message SendEmailAck {
+  bool accepted = 1;
+  string message_id = 2;
+}

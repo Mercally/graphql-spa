@@ -15,12 +15,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />
     <PackageReference Include="Grpc.Core.Testing" Version="2.46.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WorkApi\WorkApi.csproj" />
+    <!-- NotificationService.csproj generates both server and client stubs from its own .proto
+         (GrpcServices="Both") - referencing it here reuses that client instead of generating a
+         second, type-conflicting copy of the same message classes. -->
+    <ProjectReference Include="..\..\src\NotificationService\NotificationService.csproj" />
   </ItemGroup>
 
 </Project>

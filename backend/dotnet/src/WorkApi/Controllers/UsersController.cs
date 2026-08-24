@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using WorkApi.DTOs;
 using WorkApi.Models;
 using WorkApi.Repositories;
+using WorkApi.Services.Notifications;
 
 namespace WorkApi.Controllers;
 
@@ -12,11 +13,13 @@ public class UsersController : ControllerBase
 {
     private readonly IUserRepository _repo;
     private readonly IMapperHelper _mapper;
+    private readonly INotificationTrigger _notifications;
 
-    public UsersController(IUserRepository repo, IMapperHelper mapper)
+    public UsersController(IUserRepository repo, IMapperHelper mapper, INotificationTrigger notifications)
     {
         _repo = repo;
         _mapper = mapper;
+        _notifications = notifications;
     }
 
     [HttpGet]
@@ -46,6 +49,7 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var entity = MapCreate(dto);
         var created = await _repo.InsertAsync(entity).ConfigureAwait(false);
+        await _notifications.UserWelcomeAsync(created).ConfigureAwait(false);
         return CreatedAtAction("Get", new { id = created.Id }, _mapper.MapUserToDto(created));
     }
 

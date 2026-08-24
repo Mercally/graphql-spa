@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\backend\dotnet\src\WorkApi\WorkApi.csproj" />
+    <ProjectReference Include="..\backend\dotnet\src\NotificationService\NotificationService.csproj" />
     <ProjectReference Include="..\frontend\mvc\WorkMvc\WorkMvc.csproj" />
   </ItemGroup>
 

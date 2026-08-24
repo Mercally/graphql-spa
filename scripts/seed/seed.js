@@ -38,7 +38,7 @@ function buildData() {
   for (let i = 0; i < 25; i++) {
     users.push({
       name: firstNames[i],
-      email: `${firstNames[i].toLowerCase()}@example.com`,
+      email: `${firstNames[i].toLowerCase()}@mailinator.com`,
       role: roles[i % roles.length],
       createdAt: new Date(),
     });

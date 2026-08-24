@@ -1,6 +1,7 @@
 using HotChocolate;
 using WorkApi.Models;
 using WorkApi.Repositories;
+using WorkApi.Services.Notifications;
 
 namespace WorkApi.GraphQL.Mutations;
 
@@ -89,10 +90,13 @@ public class MutationResolvers
     }
 
     public async ValueTask<UserModel> CreateUser(
-        [Service] IUserRepository repo, string name, string email, string role)
+        [Service] IUserRepository repo, [Service] INotificationTrigger notifications,
+        string name, string email, string role)
     {
         var entity = new UserModel { Name = name, Email = email, Role = role };
-        return await repo.InsertAsync(entity).ConfigureAwait(false);
+        var created = await repo.InsertAsync(entity).ConfigureAwait(false);
+        await notifications.UserWelcomeAsync(created).ConfigureAwait(false);
+        return created;
     }
 
     public async ValueTask<UserModel?> UpdateUser(
@@ -113,7 +117,8 @@ public class MutationResolvers
     }
 
     public async ValueTask<TaskModel> CreateTask(
-        [Service] ITaskRepository repo, string title, string? description, string projectId, string? status, string? assignedUserId, List<string?>? tagIds)
+        [Service] ITaskRepository repo, [Service] INotificationTrigger notifications,
+        string title, string? description, string projectId, string? status, string? assignedUserId, List<string?>? tagIds)
     {
         var entity = new TaskModel
         {
@@ -124,21 +129,30 @@ public class MutationResolvers
             AssignedUserId = assignedUserId,
             TagIds = tagIds ?? new List<string?>()
         };
-        return await repo.InsertAsync(entity).ConfigureAwait(false);
+        var created = await repo.InsertAsync(entity).ConfigureAwait(false);
+        await notifications.TaskAssignedAsync(created).ConfigureAwait(false);
+        return created;
     }
 
     public async ValueTask<TaskModel?> UpdateTask(
-        [Service] ITaskRepository repo, string id, string title, string? description, string? status, string? assignedUserId, List<string?>? tagIds)
+        [Service] ITaskRepository repo, [Service] INotificationTrigger notifications,
+        string id, string title, string? description, string? status, string? assignedUserId, List<string?>? tagIds)
     {
         var existing = await repo.GetByIdAsync(id).ConfigureAwait(false);
         if (existing == null) return null;
+        var previousAssignedUserId = existing.AssignedUserId;
         existing.Title = title;
         existing.Description = description ?? existing.Description;
         existing.Status = status ?? existing.Status;
         existing.AssignedUserId = assignedUserId ?? existing.AssignedUserId;
         if (tagIds != null) existing.TagIds = tagIds;
         existing.UpdatedAt = DateTime.UtcNow;
-        return await repo.UpdateAsync(id, existing).ConfigureAwait(false);
+        var updated = await repo.UpdateAsync(id, existing).ConfigureAwait(false);
+        if (updated != null && !string.IsNullOrEmpty(updated.AssignedUserId) && updated.AssignedUserId != previousAssignedUserId)
+        {
+            await notifications.TaskAssignedAsync(updated).ConfigureAwait(false);
+        }
+        return updated;
     }
 
     public async ValueTask<bool> DeleteTask(

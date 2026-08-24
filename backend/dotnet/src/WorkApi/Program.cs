@@ -1,8 +1,16 @@
+using Grpc.Net.Client;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using NotificationService.Protos;
 using WorkApi;
 using WorkApi.Repositories;
 using WorkApi.Services;
+using WorkApi.Services.Notifications;
+
+// GrpcChannel.ForAddress needs this switch set before the channel is created to allow
+// HTTP/2 over plain HTTP (no TLS) - matches the rest of this PoC, which runs everything
+// over plain HTTP (Requirements.md section 35).
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +40,14 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 builder.Services.AddScoped<IMapperHelper, MapperHelper>();
 builder.Services.AddScoped<IWorkDomainService, WorkDomainService>();
+
+var notificationGrpcUrl = Environment.GetEnvironmentVariable("NOTIFICATION_GRPC_URL")
+    ?? builder.Configuration["Notifications:GrpcUrl"]
+    ?? "http://localhost:5100";
+
+builder.Services.AddSingleton(sp =>
+    new EmailNotifier.EmailNotifierClient(GrpcChannel.ForAddress(notificationGrpcUrl)));
+builder.Services.AddScoped<INotificationTrigger, NotificationTrigger>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

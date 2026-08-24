@@ -20,12 +20,20 @@ var mongo = builder.AddMongoDB("mongo", userName: mongoUser, password: mongoPass
 
 var mongoDb = mongo.AddDatabase("workmanagement");
 
+// Notification microservice (Requirements.md section 35) - simulated email sender, talks gRPC
+// only, no REST/GraphQL, no Mongo. dotnet-api is its only caller for now.
+var notifications = builder.AddProject<Projects.NotificationService>("notifications")
+    .WithHttpEndpoint(port: 5100, env: "ASPNETCORE_HTTP_PORTS")
+    .WithExternalHttpEndpoints();
+
 // .NET backend (REST + GraphQL on one Kestrel host).
 var dotnetApi = builder.AddProject<Projects.WorkApi>("dotnet-api")
     .WithHttpEndpoint(port: 5000, env: "ASPNETCORE_HTTP_PORTS")
     .WithEnvironment("MONGODB_CONNECTION_STRING", mongoDb)
     .WithEnvironment("MONGODB_DATABASE", "workmanagement")
+    .WithEnvironment("NOTIFICATION_GRPC_URL", notifications.GetEndpoint("http"))
     .WaitFor(mongoDb)
+    .WaitFor(notifications)
     .WithExternalHttpEndpoints();
 
 // Node.js backend (REST + GraphQL on one Fastify host) — same schema/data.

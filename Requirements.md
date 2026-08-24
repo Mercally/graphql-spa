@@ -1188,3 +1188,43 @@ una query / estructura exactamente definida por el cliente
 ```
 
 El resultado debe ser un **laboratorio práctico de GraphQL vs REST**, no solamente un conjunto de CRUDs.
+
+---
+
+# 35. Microservicio de notificaciones por email (gRPC)
+
+Agregar un microservicio nuevo, independiente de `WorkApi`, que simule el envío de correos y se comunique con `WorkApi` vía **gRPC** (el estándar moderno para comunicación entre backends, en lugar de otro REST/GraphQL interno).
+
+## 1. NotificationService
+
+- Proyecto ASP.NET Core separado: `backend/dotnet/src/NotificationService` (net8.0, `Grpc.AspNetCore`).
+- Sin base de datos, sin estado — no persiste nada.
+- Sin configuración de envío real (sin SMTP host, sin API key) — de momento el envío es **simulado**: solo loguea `"Simulated email sent to {to}: {subject}"` y responde un ack.
+- Corre como recurso propio dentro del Aspire AppHost (`notifications`), puerto propio, gRPC sobre HTTP plano (sin TLS, consistente con el resto de la PoC).
+
+## 2. Contrato gRPC
+
+Un solo método genérico, reutilizado para cualquier tipo de correo (el dominio del mensaje lo arma quien llama, no el microservicio):
+
+```proto
+service EmailNotifier {
+  rpc SendEmail (SendEmailRequest) returns (SendEmailAck);
+}
+message SendEmailRequest { string to = 1; string subject = 2; string body = 3; }
+message SendEmailAck { bool accepted = 1; string messageId = 2; }
+```
+
+## 3. Integración con WorkApi
+
+`WorkApi` es el único backend que le habla a `NotificationService` (Node.js queda sin tocar en esta etapa). Cliente gRPC generado a partir del mismo `.proto`, referenciado directamente desde `WorkApi.csproj`.
+
+Un correo se dispara en estos eventos:
+
+- **Tarea asignada**: al crear una Task con `assignedUserId`, o al actualizar una Task y el `assignedUserId` cambia a un usuario distinto.
+- **Usuario creado**: bienvenida al crear un User.
+
+La llamada gRPC nunca debe romper el request HTTP/GraphQL que la origina: se hace `await` sobre la llamada pero cualquier excepción se captura y solo se loguea, nunca se propaga.
+
+## 4. Datos de prueba (seed)
+
+Los emails de los usuarios sembrados en `scripts/seed/seed.js` deben usar el dominio de **Mailinator** (`@mailinator.com`) en lugar de `@example.com`, para poder revisar en una inbox pública real durante pruebas manuales. Los emails de `customers` no cambian (no reciben notificaciones en este alcance).

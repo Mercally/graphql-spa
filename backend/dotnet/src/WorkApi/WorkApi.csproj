@@ -10,6 +10,18 @@
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.12" />
     <PackageReference Include="MongoDB.Driver" Version="2.27.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.66.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Client stub generated from NotificationService's own .proto - no separate contracts
+         project, the .proto file is the shared contract between the two services. -->
+    <Protobuf Include="..\NotificationService\Protos\notification.proto" GrpcServices="Client" Link="Protos\notification.proto" />
   </ItemGroup>
 
 </Project>

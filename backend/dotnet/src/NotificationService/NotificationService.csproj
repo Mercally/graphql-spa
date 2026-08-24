@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- "Both" (not just "Server") so this assembly's own client stub can be reused by tests
+         and by any future same-process caller, instead of each consumer regenerating - and
+         conflicting on - the same message types. WorkApi still generates its own client stub
+         directly from this .proto (see WorkApi.csproj) since it can't take a project reference
+         here without an inverted dependency. -->
+    <Protobuf Include="Protos\notification.proto" GrpcServices="Both" />
+  </ItemGroup>
+
+</Project>

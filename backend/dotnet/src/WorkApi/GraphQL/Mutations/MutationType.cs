@@ -76,7 +76,7 @@ public class MutationType : ObjectType
             .Argument("name", a => a.Type<NonNullType<StringType>>())
             .Argument("email", a => a.Type<NonNullType<StringType>>())
             .Argument("role", a => a.Type<NonNullType<StringType>>())
-            .ResolveWith<MutationResolvers>(r => r.CreateUser(default!, default!, default!, default!));
+            .ResolveWith<MutationResolvers>(r => r.CreateUser(default!, default!, default!, default!, default!));
 
         descriptor.Field("updateUser")
             .Type<UserType>()
@@ -100,7 +100,7 @@ public class MutationType : ObjectType
             .Argument("status", a => a.Type<StringType>().DefaultValue("pending"))
             .Argument("assignedUserId", a => a.Type<IdType>())
             .Argument("tagIds", a => a.Type<ListType<IdType>>())
-            .ResolveWith<MutationResolvers>(r => r.CreateTask(default!, default!, default, default!, default, default, default));
+            .ResolveWith<MutationResolvers>(r => r.CreateTask(default!, default!, default!, default, default!, default, default, default));
 
         descriptor.Field("updateTask")
             .Type<TaskType>()
@@ -110,7 +110,7 @@ public class MutationType : ObjectType
             .Argument("status", a => a.Type<StringType>())
             .Argument("assignedUserId", a => a.Type<IdType>())
             .Argument("tagIds", a => a.Type<ListType<IdType>>())
-            .ResolveWith<MutationResolvers>(r => r.UpdateTask(default!, default!, default!, default, default, default, default));
+            .ResolveWith<MutationResolvers>(r => r.UpdateTask(default!, default!, default!, default!, default, default, default, default));
 
         descriptor.Field("deleteTask")
             .Type<BooleanType>()

@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using WorkApi.DTOs;
 using WorkApi.Models;
 using WorkApi.Repositories;
+using WorkApi.Services.Notifications;
 
 namespace WorkApi.Controllers;
 
@@ -12,11 +13,13 @@ public class TasksController : ControllerBase
 {
     private readonly ITaskRepository _repo;
     private readonly IMapperHelper _mapper;
+    private readonly INotificationTrigger _notifications;
 
-    public TasksController(ITaskRepository repo, IMapperHelper mapper)
+    public TasksController(ITaskRepository repo, IMapperHelper mapper, INotificationTrigger notifications)
     {
         _repo = repo;
         _mapper = mapper;
+        _notifications = notifications;
     }
 
     [HttpGet]
@@ -58,6 +61,7 @@ public class TasksController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var entity = MapCreate(dto);
         var created = await _repo.InsertAsync(entity).ConfigureAwait(false);
+        await _notifications.TaskAssignedAsync(created).ConfigureAwait(false);
         return CreatedAtAction("Get", new { id = created.Id }, _mapper.MapTaskToDto(created));
     }
 
@@ -67,6 +71,7 @@ public class TasksController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var entity = await _repo.GetByIdAsync(id).ConfigureAwait(false);
         if (entity == null) return NotFound();
+        var previousAssignedUserId = entity.AssignedUserId;
         entity.Title = dto.Title ?? entity.Title;
         entity.Description = dto.Description ?? entity.Description;
         entity.Status = dto.Status ?? entity.Status;
@@ -75,6 +80,10 @@ public class TasksController : ControllerBase
         entity.UpdatedAt = DateTime.UtcNow;
         var updated = await _repo.UpdateAsync(id, entity).ConfigureAwait(false);
         if (updated == null) return NotFound();
+        if (!string.IsNullOrEmpty(updated.AssignedUserId) && updated.AssignedUserId != previousAssignedUserId)
+        {
+            await _notifications.TaskAssignedAsync(updated).ConfigureAwait(false);
+        }
         return Ok(_mapper.MapTaskToDto(updated));
     }
 
